@@ -62,17 +62,31 @@ var AwesomeProject = React.createClass({
       })
       .done();
   },
-  goClick:function(e){
+  goClick: function(e) {
     var me = this;
     console.log('click');
     fetch('http://192.168.100.112:3000/login')
-        .then((response) => response.json())
-        .then((responseData) => {
-          me.setState({
-            dd: responseData.msg1
-          });
-        })
-        .done();
+      .then((response) => {
+        console.log(response);
+        if (response.ok) {
+          return response.json();
+        } else {
+          return {
+            dd: 'error'
+          };
+        }
+
+      })
+      .then((responseData) => {
+        me.setState({
+          dd: responseData.msg1
+        });
+      }).catch(function(error) {
+         me.setState({
+          dd:error.message
+        });
+          
+      }).done();
   },
   render: function() {
     if (!this.state.movies) {
