@@ -26,7 +26,8 @@ var AwesomeProject = React.createClass({
       }),
       loaded: false,
       movies: null,
-      dd: test
+      dd: test,
+      post:'loading...'
     };
   },
   componentDidMount: function() {
@@ -82,11 +83,47 @@ var AwesomeProject = React.createClass({
           dd: responseData.msg1
         });
       }).catch(function(error) {
-         me.setState({
-          dd:error.message
+        me.setState({
+          dd: error.message
         });
-          
+
       }).done();
+    
+   //http://192.168.100.112:3000/login
+    fetch('http://192.168.100.112:3000/login', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "admin_name": '2',
+            "admin_pwd": '2'
+          })
+       })
+      .then((response) => {
+        console.log(response);
+        if (response.ok) {
+          return response.json();
+        } else {
+          return {
+            post: 'error'
+          };
+        }
+
+      })
+      .then((responseData) => {
+        me.setState({
+          post: responseData.msg
+        });
+      }).catch(function(error) {
+        me.setState({
+          post: error.message
+        });
+
+      }).done();
+
+   
   },
   render: function() {
     if (!this.state.movies) {
@@ -105,6 +142,7 @@ var AwesomeProject = React.createClass({
             
           </ListView>
           <Text >{this.state.dd} </Text>
+          <Text >{this.state.post} </Text>
           <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
             <Text style={styles.buttonText} >Go</Text> 
            </TouchableHighlight>
