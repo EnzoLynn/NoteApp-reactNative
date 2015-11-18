@@ -13,12 +13,28 @@ var {
   Text,
   View,
   ListView,
-  TouchableHighlight
+  TouchableHighlight,
+  ToolbarAndroid,
+  Navigator,
+  BackAndroid,
+  DrawerLayoutAndroid
 } = React;
 //var req_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";//"http://192.168.100.112:818/data/movies.json";
-var req_url = "http://192.168.100.112:818/data/movies.json";
+var req_url = "http://192.168.91.101:818/data/movies.json";
+var req_url3000 = "http://192.168.91.101:3000";
+var ToolbarTop = require('./toolbar.android.js');
+var NoteList = require('./NoteList.android.js');
+var _navigator;
+BackAndroid.addEventListener('hardwareBackPress', function() {
+  console.log('hardwareBackPress');
+  if (_navigator && _navigator.getCurrentRoutes().length > 1) {
+    _navigator.pop(); 
+    return true;
+  }
+  return false;
+});
 
-var AwesomeProject = React.createClass({
+var NodeApp = React.createClass({
   getInitialState: function() {
     return {
       dataSource: new ListView.DataSource({
@@ -26,13 +42,18 @@ var AwesomeProject = React.createClass({
       }),
       loaded: false,
       movies: null,
-      dd: test,
-      post:'loading...'
+      dd: `${test} init`,
+      post: 'loading...',
+      route: {
+        name: 'home',
+        index: 0
+      },
+      routeIndex: 0
     };
   },
   componentDidMount: function() {
     var me = this;
-    me.fetchData();
+    this.fetchData();
     // setTimeout(function() {
     //   fetch('http://192.168.100.112:3000/login')
     //     .then((response) => response.json())
@@ -48,17 +69,15 @@ var AwesomeProject = React.createClass({
 
   },
   fetchData: function() {
-    console.log(123123);
+
+
     fetch(req_url)
       .then((response) => response.json())
       .then((responseData) => {
-        console.log(responseData);
         this.setState({
           movies: responseData.data,
           dataSource: this.state.dataSource.cloneWithRows(responseData.data),
-          loaded: true //,
-            //dd: test
-
+          loaded: true  
         });
       })
       .done();
@@ -66,7 +85,7 @@ var AwesomeProject = React.createClass({
   goClick: function(e) {
     var me = this;
     console.log('click');
-    fetch('http://192.168.100.112:3000/login')
+    fetch(`${req_url3000}/login`)
       .then((response) => {
         console.log(response);
         if (response.ok) {
@@ -88,19 +107,19 @@ var AwesomeProject = React.createClass({
         });
 
       }).done();
-    
-   //http://192.168.100.112:3000/login
-    fetch('http://192.168.100.112:3000/login', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            "admin_name": '2',
-            "admin_pwd": '2'
-          })
-       })
+
+    //http://192.168.100.112:3000/login
+    fetch(`${req_url3000}/login`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "admin_name": '2',
+          "admin_pwd": '2'
+        })
+      })
       .then((response) => {
         console.log(response);
         if (response.ok) {
@@ -113,6 +132,7 @@ var AwesomeProject = React.createClass({
 
       })
       .then((responseData) => {
+        console.log(responseData.success);
         me.setState({
           post: responseData.msg
         });
@@ -123,37 +143,91 @@ var AwesomeProject = React.createClass({
 
       }).done();
 
-   
+
   },
-  render: function() {
-    if (!this.state.movies) {
-      return this.renderLoadingView();
-    }
+  RouteMapper: function(route, navigationOperations, onComponentRef) {
+    _navigator = navigationOperations;
+    if (route.name == 'home') {
+      var navigationView = (
+    <View style={{flex: 1, backgroundColor: '#fff'}}>
+      <Text style={{margin: 10, fontSize: 15, textAlign: 'left'}}>I'm in the Drawer!</Text>
+       <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
+        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
+    </View>
+  );
+      return (
+        <View style={styles.container1}> 
+          <ToolbarTop navigator={_navigator} myico={this.state.movies[0].posters.thumbnail} />
+        
+          <NoteList />
+ <DrawerLayoutAndroid
+      drawerWidth={300}
+      drawerPosition={DrawerLayoutAndroid.positions.Right}
+      renderNavigationView={() => navigationView}>
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
+        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
+      </View>
+    </DrawerLayoutAndroid>
 
-    return (
-      <View>
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this.renderMovie}
-            style={styles.listView}
-          >
 
-
-            
-          </ListView>
           <Text >{this.state.dd} </Text>
           <Text >{this.state.post} </Text>
           <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
             <Text style={styles.buttonText} >Go</Text> 
            </TouchableHighlight>
         </View>
+      );
+    } else if (route.name == 'story') {
+      return (
+        <View style={styles.container2}> 
+          <ToolbarTop  navigator={_navigator} myico={this.state.movies[0].posters.thumbnail}/>
+       
+            <NoteList />
+          <Text >{this.state.dd} </Text>
+          <Text >{this.state.post} </Text>
+          <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
+            <Text style={styles.buttonText} >Go</Text> 
+           </TouchableHighlight>
+        </View>
+      );
+    }
+  },
+  onActionSelected: function(position) {
+    if (position === 0) { // index of 'Settings' 
+
+      if (_navigator.getCurrentRoutes()[1]) {
+        _navigator.popToRoute(_navigator.getCurrentRoutes()[1]);
+      } else {
+        _navigator.push({
+          name: 'story',
+          index: 1
+        });
+      }
+    } else if (position === 1) {
+      _navigator.popToRoute(_navigator.getCurrentRoutes()[0]);
+    } else {
+      _navigator.popToTop();
+    }
+  },
+  render: function() {
+    if (!this.state.movies) {
+      return this.renderLoadingView();
+    }
+    return ( 
+      <Navigator 
+          style={styles.container1}
+          initialRoute={this.state.route}
+          configureScene={() => Navigator.SceneConfigs.FadeAndroid}
+          renderScene={this.RouteMapper}
+        />
     );
 
 
   },
-  renderLoadingView: function() {
+  renderLoadingView: function() { 
     return (
-      <View style={styles.container}>
+      <View style={styles.container} >
           <Text>
             Loading movies...
           </Text>
@@ -161,29 +235,21 @@ var AwesomeProject = React.createClass({
     );
 
   },
-  renderMovie: function(movie) {
-
-    return (
-
-      <View style={styles.container}> 
-            <Image
-              source={{uri: movie.posters.thumbnail}}
-              style={styles.thumbnail}
-            />
-            <View style={styles.rightContainer}>
-              <Text style={styles.title}>{movie.title} nn</Text>
-              <Text style={styles.year}>{movie.year}</Text>
-             
-            </View>
-          </View>
-
-
-    );
-
-  }
+ 
 });
 
 var styles = StyleSheet.create({
+  container1: {
+    flex: 1,
+    backgroundColor: '#00a2ed',
+    flexDirection: 'column',
+  },
+  container2: {
+    flex: 1,
+    height: 56,
+    backgroundColor: '#39ED00',
+    flexDirection: 'column',
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
@@ -205,7 +271,9 @@ var styles = StyleSheet.create({
   },
   thumbnail: {
     width: 53,
-    height: 81
+    height: 81,
+    borderWidth: 1,
+    borderColor: 'red'
   },
   buttonText: {
     fontSize: 18,
@@ -224,8 +292,12 @@ var styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'center'
   },
+  toolbar: {
+    backgroundColor: '#00a2ed',
+    height: 56,
+  }
 });
 
 
 
-AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
+AppRegistry.registerComponent('AwesomeProject', () => NodeApp);
