@@ -18,11 +18,13 @@ var {
   Navigator,
   BackAndroid,
   DrawerLayoutAndroid,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  AsyncStorage
 } = React;
 //var req_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";//"http://192.168.100.112:818/data/movies.json";
-var req_url = "http://192.168.91.101:818/data/movies.json";
-var req_url3000 = "http://192.168.91.101:3000";
+var req_url = "http://192.168.100.101:818/data/movies.json";
+var req_url3000 = "http://192.168.100.101:3000";
+var STORAGE_KEY = '@AsyncStorageExample:key';
 var ToolbarTop = require('./toolbar.android.js');
 var NoteList = require('./NoteList.android.js');
 var _navigator;
@@ -34,16 +36,16 @@ BackAndroid.addEventListener('hardwareBackPress', function() {
   }
   return false;
 });
- // <DrawerLayoutAndroid
-           //      drawerWidth={300}
-           //      keyboardDismissMode="on-drag"
-           //      drawerPosition={DrawerLayoutAndroid.positions.Right}
-           //      renderNavigationView={() => navigationView}>
-           //      <View style={{flex: 1, alignItems: 'center'}}>
-           //        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
-           //        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
-           //      </View>
-           //    </DrawerLayoutAndroid>
+// <DrawerLayoutAndroid
+//      drawerWidth={300}
+//      keyboardDismissMode="on-drag"
+//      drawerPosition={DrawerLayoutAndroid.positions.Right}
+//      renderNavigationView={() => navigationView}>
+//      <View style={{flex: 1, alignItems: 'center'}}>
+//        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
+//        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
+//      </View>
+//    </DrawerLayoutAndroid>
 var NodeApp = React.createClass({
   getInitialState: function() {
     return {
@@ -58,7 +60,8 @@ var NodeApp = React.createClass({
         name: 'home',
         index: 0
       },
-      routeIndex: 0
+      routeIndex: 0,
+      storage: 'ttt'
     };
   },
   componentDidMount: function() {
@@ -76,6 +79,22 @@ var NodeApp = React.createClass({
 
     // }, 2000)
 
+    AsyncStorage.getItem(STORAGE_KEY).then((value) => {
+        if (value !== null) {
+          this.setState({
+            storage: value
+          });
+          console.log('Recovered selection from disk: ' + value);
+        } else {
+          console.log('Initialized with no selection on disk.');
+        }
+      })
+      .catch((error) => console.log('AsyncStorage error: ' + error.message))
+      .done();
+
+
+
+    AsyncStorage.setItem(STORAGE_KEY, new Date());
 
   },
   fetchData: function() {
@@ -155,7 +174,7 @@ var NodeApp = React.createClass({
 
 
   },
-  getEvent:function(aa,bb,cc){
+  getEvent: function(aa, bb, cc) {
     console.log(aa);
     console.log(bb);
   },
@@ -175,7 +194,7 @@ var NodeApp = React.createClass({
     } else if (route.name == 'story') {
       style = styles.container2;
     }
-    var views = ( 
+    var views = (
       <View style={style}>
           <ToolbarTop navigator={_navigator} myico={this.state.movies[0].posters.thumbnail} /> 
 
@@ -183,7 +202,7 @@ var NodeApp = React.createClass({
           <NoteList /> 
 
           
-
+             <Text >{this.state.storage} </Text>
 
           <Text >{this.state.dd} </Text>
           <Text >{this.state.post} </Text>
