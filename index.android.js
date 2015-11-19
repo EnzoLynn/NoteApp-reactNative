@@ -17,7 +17,8 @@ var {
   ToolbarAndroid,
   Navigator,
   BackAndroid,
-  DrawerLayoutAndroid
+  DrawerLayoutAndroid,
+  TouchableWithoutFeedback
 } = React;
 //var req_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";//"http://192.168.100.112:818/data/movies.json";
 var req_url = "http://192.168.91.101:818/data/movies.json";
@@ -28,12 +29,21 @@ var _navigator;
 BackAndroid.addEventListener('hardwareBackPress', function() {
   console.log('hardwareBackPress');
   if (_navigator && _navigator.getCurrentRoutes().length > 1) {
-    _navigator.pop(); 
+    _navigator.pop();
     return true;
   }
   return false;
 });
-
+ // <DrawerLayoutAndroid
+           //      drawerWidth={300}
+           //      keyboardDismissMode="on-drag"
+           //      drawerPosition={DrawerLayoutAndroid.positions.Right}
+           //      renderNavigationView={() => navigationView}>
+           //      <View style={{flex: 1, alignItems: 'center'}}>
+           //        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
+           //        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
+           //      </View>
+           //    </DrawerLayoutAndroid>
 var NodeApp = React.createClass({
   getInitialState: function() {
     return {
@@ -77,7 +87,7 @@ var NodeApp = React.createClass({
         this.setState({
           movies: responseData.data,
           dataSource: this.state.dataSource.cloneWithRows(responseData.data),
-          loaded: true  
+          loaded: true
         });
       })
       .done();
@@ -145,53 +155,48 @@ var NodeApp = React.createClass({
 
 
   },
+  getEvent:function(aa,bb,cc){
+    console.log(aa);
+    console.log(bb);
+  },
   RouteMapper: function(route, navigationOperations, onComponentRef) {
     _navigator = navigationOperations;
-    if (route.name == 'home') {
-      var navigationView = (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    var navigationView = (
+      <View style={{flex: 1, backgroundColor: '#fff'}}>
       <Text style={{margin: 10, fontSize: 15, textAlign: 'left'}}>I'm in the Drawer!</Text>
        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
         <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
     </View>
-  );
-      return (
-        <View style={styles.container1}> 
-          <ToolbarTop navigator={_navigator} myico={this.state.movies[0].posters.thumbnail} />
-        
-          <NoteList />
- <DrawerLayoutAndroid
-      drawerWidth={300}
-      drawerPosition={DrawerLayoutAndroid.positions.Right}
-      renderNavigationView={() => navigationView}>
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
-        <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
-      </View>
-    </DrawerLayoutAndroid>
+    );
+    var style = styles.container1;
+    if (route.name == 'home') {
+      style = styles.container1;
 
-
-          <Text >{this.state.dd} </Text>
-          <Text >{this.state.post} </Text>
-          <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
-            <Text style={styles.buttonText} >Go</Text> 
-           </TouchableHighlight>
-        </View>
-      );
     } else if (route.name == 'story') {
-      return (
-        <View style={styles.container2}> 
-          <ToolbarTop  navigator={_navigator} myico={this.state.movies[0].posters.thumbnail}/>
-       
-            <NoteList />
+      style = styles.container2;
+    }
+    var views = ( 
+      <View style={style}>
+          <ToolbarTop navigator={_navigator} myico={this.state.movies[0].posters.thumbnail} /> 
+
+   
+          <NoteList /> 
+
+          
+
+
           <Text >{this.state.dd} </Text>
           <Text >{this.state.post} </Text>
           <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
             <Text style={styles.buttonText} >Go</Text> 
            </TouchableHighlight>
-        </View>
-      );
-    }
+           </View>
+
+
+    );
+    return ({
+      views
+    });
   },
   onActionSelected: function(position) {
     if (position === 0) { // index of 'Settings' 
@@ -214,7 +219,7 @@ var NodeApp = React.createClass({
     if (!this.state.movies) {
       return this.renderLoadingView();
     }
-    return ( 
+    return (
       <Navigator 
           style={styles.container1}
           initialRoute={this.state.route}
@@ -225,7 +230,7 @@ var NodeApp = React.createClass({
 
 
   },
-  renderLoadingView: function() { 
+  renderLoadingView: function() {
     return (
       <View style={styles.container} >
           <Text>
@@ -235,7 +240,7 @@ var NodeApp = React.createClass({
     );
 
   },
- 
+
 });
 
 var styles = StyleSheet.create({
