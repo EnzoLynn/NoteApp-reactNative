@@ -22,8 +22,8 @@ var {
   AsyncStorage
 } = React;
 //var req_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";//"http://192.168.100.112:818/data/movies.json";
-var req_url = "http://192.168.100.101:818/data/movies.json";
-var req_url3000 = "http://192.168.100.101:3000";
+var req_url = "http://192.168.91.101:818/data/movies.json";
+var req_url3000 = "http://192.168.91.101:3000";
 var STORAGE_KEY = '@AsyncStorageExample:key';
 var ToolbarTop = require('./toolbar.android.js');
 var NoteList = require('./NoteList.android.js');
@@ -79,7 +79,12 @@ var NodeApp = React.createClass({
 
     // }, 2000)
 
-    AsyncStorage.getItem(STORAGE_KEY).then((value) => {
+     this.setAsyncStorage();
+
+  },
+  setAsyncStorage:function(){
+     AsyncStorage.setItem(STORAGE_KEY, new Date());
+     AsyncStorage.getItem(STORAGE_KEY).then((value) => {
         if (value !== null) {
           this.setState({
             storage: value
@@ -94,8 +99,7 @@ var NodeApp = React.createClass({
 
 
 
-    AsyncStorage.setItem(STORAGE_KEY, new Date());
-
+   
   },
   fetchData: function() {
 
@@ -114,6 +118,7 @@ var NodeApp = React.createClass({
   goClick: function(e) {
     var me = this;
     console.log('click');
+    this.setAsyncStorage();
     fetch(`${req_url3000}/login`)
       .then((response) => {
         console.log(response);

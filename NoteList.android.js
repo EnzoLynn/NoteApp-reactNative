@@ -14,10 +14,10 @@
    BackAndroid,
    TouchableOpacity
  } = React;
- var req_url = "http://192.168.100.101:818/data/movies.json";
+ var req_url = "http://192.168.91.101:818/data/movies.json";
  var test = require('./test.js');
 var pushState = require('./PushState.js');
-var req_url3000 = "http://192.168.100.101:3000";
+var req_url3000 = "http://192.168.91.101:3000";
  var NoteList = React.createClass({
    getEvent: function(aa, bb, cc) {
      console.log(aa.nativeEvent);
