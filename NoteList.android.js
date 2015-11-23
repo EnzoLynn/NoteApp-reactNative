@@ -14,10 +14,12 @@
    BackAndroid,
    TouchableOpacity
  } = React;
- var req_url = "http://192.168.91.101:818/data/movies.json";
+
+ var Config = require('./Config.js');
+ // var req_url = "http://192.168.91.101:818/data/movies.json";
  var test = require('./test.js');
 var pushState = require('./PushState.js');
-var req_url3000 = "http://192.168.91.101:3000";
+// var req_url3000 = "http://192.168.91.101:3000";
  var NoteList = React.createClass({
    getEvent: function(aa, bb, cc) {
      console.log(aa.nativeEvent);
@@ -29,8 +31,8 @@ var req_url3000 = "http://192.168.91.101:3000";
    },
    onPressOut: function(e,name) { 
     console.log(name);
-     if (pushState.top) {
-         fetch(`${req_url3000}/login`)
+     if (pushState.top && pushState.move) {
+         fetch(`${Config.req_url3000}/login`)
       .then((response) => { 
       })
       .then((responseData) => { 
@@ -40,9 +42,11 @@ var req_url3000 = "http://192.168.91.101:3000";
          console.log(pushState.top);
      }
      pushState.on = false;
+     pushState.move = false;
       pushState.yArr = [];
    },
    onMoveShouldSetResponder: function(event,name) {
+    pushState.move = true;
    // console.log(name);
      // if (pushState.on) { 
      //    console.log(pushState.yArr);
@@ -114,7 +118,7 @@ var req_url3000 = "http://192.168.91.101:3000";
      me.fetchData();
    },
    fetchData: function() {
-     fetch(req_url)
+     fetch(Config.req_url)
        .then((response) => response.json())
        .then((responseData) => {
          this.setState({

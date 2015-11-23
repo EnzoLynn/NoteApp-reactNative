@@ -19,11 +19,13 @@ var {
   BackAndroid,
   DrawerLayoutAndroid,
   TouchableWithoutFeedback,
-  AsyncStorage
+  AsyncStorage,
+  ToastAndroid
 } = React;
 //var req_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";//"http://192.168.100.112:818/data/movies.json";
-var req_url = "http://192.168.91.101:818/data/movies.json";
-var req_url3000 = "http://192.168.91.101:3000";
+// var req_url = "http://192.168.91.101:818/data/movies.json";
+// var req_url3000 = "http://192.168.91.101:3000";
+var Config = require('./Config.js');
 var STORAGE_KEY = '@AsyncStorageExample:key';
 var ToolbarTop = require('./toolbar.android.js');
 var NoteList = require('./NoteList.android.js');
@@ -103,8 +105,8 @@ var NodeApp = React.createClass({
   },
   fetchData: function() {
 
-
-    fetch(req_url)
+    console.log(Config);
+    fetch(Config.req_url)
       .then((response) => response.json())
       .then((responseData) => {
         this.setState({
@@ -118,8 +120,9 @@ var NodeApp = React.createClass({
   goClick: function(e) {
     var me = this;
     console.log('click');
+    ToastAndroid.show('This is a toast with short duration', ToastAndroid.SHORT)
     this.setAsyncStorage();
-    fetch(`${req_url3000}/login`)
+    fetch(`${Config.req_url3000}/login`)
       .then((response) => {
         console.log(response);
         if (response.ok) {
@@ -143,7 +146,7 @@ var NodeApp = React.createClass({
       }).done();
 
     //http://192.168.100.112:3000/login
-    fetch(`${req_url3000}/login`, {
+    fetch(`${Config.req_url3000}/login`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -211,6 +214,16 @@ var NodeApp = React.createClass({
 
           <Text >{this.state.dd} </Text>
           <Text >{this.state.post} </Text>
+          <DrawerLayoutAndroid
+           drawerWidth={300}
+           keyboardDismissMode="on-drag"
+           drawerPosition={DrawerLayoutAndroid.positions.Right}
+           renderNavigationView={() => navigationView}>
+           <View style={{flex: 1, alignItems: 'center'}}>
+             <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>Hello</Text>
+             <Text style={{margin: 10, fontSize: 15, textAlign: 'right'}}>World!</Text>
+           </View>
+         </DrawerLayoutAndroid>
           <TouchableHighlight style={styles.button} onPress={this.goClick}  underlayColor='#99d9f4'>
             <Text style={styles.buttonText} >Go</Text> 
            </TouchableHighlight>

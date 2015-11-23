@@ -1,6 +1,7 @@
 var pushState = {
    on:false,
    yArr:[],
-   top:true
+   top:true,
+   move:false
 };
 module.exports = pushState;
