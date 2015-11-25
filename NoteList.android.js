@@ -12,186 +12,145 @@
    ToolbarAndroid,
    Navigator,
    BackAndroid,
-   TouchableOpacity
+   TouchableWithoutFeedback,
+   DrawerLayoutAndroid
  } = React;
 
  var Config = require('./Config.js');
  // var req_url = "http://192.168.91.101:818/data/movies.json";
  var test = require('./test.js');
-var pushState = require('./PushState.js');
-// var req_url3000 = "http://192.168.91.101:3000";
+ var pushState = require('./PushState.js');
+ // var req_url3000 = "http://192.168.91.101:3000";
+ // 
+
  var NoteList = React.createClass({
    getEvent: function(aa, bb, cc) {
      console.log(aa.nativeEvent);
      console.log(bb);
    },
-   onPressIn: function(e,name) {
-      pushState.on = true;
-      console.log(name);
+   onPressIn: function(e, name) {
+     pushState.on = true;
+     console.log(e.nativeEvent.pageY);
+     console.log(name);
    },
-   onPressOut: function(e,name) { 
-    console.log(name);
+   onPressOut: function(e, name) {
+
      if (pushState.top && pushState.move) {
-         fetch(`${Config.req_url3000}/login`)
-      .then((response) => { 
-      })
-      .then((responseData) => { 
-      }).catch(function(error) { 
-      }).done();
-     }else{
-         console.log(pushState.top);
+       console.log(name);
+
+       // fetch(`${Config.req_url3000}/login`)
+       //   .then((response) => {})
+       //   .then((responseData) => {}).catch(function(error) {}).done();
+     } else {
+       console.log(pushState.top);
      }
      pushState.on = false;
      pushState.move = false;
-      pushState.yArr = [];
+     pushState.yArr = [];
    },
-   onMoveShouldSetResponder: function(event,name) {
-    pushState.move = true;
-   // console.log(name);
+   onMoveShouldSetResponder: function(e, name) {
+     console.log(e.nativeEvent.pageY);
+     pushState.move = true;
+     // console.log(name);
      // if (pushState.on) { 
      //    console.log(pushState.yArr);
      //     pushState.yArr.push(event.nativeEvent.locationY);
      // };
    },
-   onScroll:function(event){
-      //event.nativeEvent.contentOffset.y
-      if (event.nativeEvent.contentOffset.y != 0) {
-         pushState.top = false;
-      }else{
-         pushState.top = true;
-      }
+   onScroll: function(event) {
+     //event.nativeEvent.contentOffset.y
+     if (event.nativeEvent.contentOffset.y != 0) {
+       pushState.top = false;
+     } else {
+       pushState.top = true;
+     }
    },
-   renderMovie: function(movie) {
+   renderNote: function(note) {
+     var me = this;
 
+     var content = note.content.length < 20 ? note.content : (note.content.substring(0, 20) + '...');
+     if (content.length == 0) {
+       content = '无';
+     };
+     var title = note.title.length > 0 ? note.title : '无';
      return (
-
-
-       <TouchableOpacity  
-        onPressIn ={(e) => this.onPressIn(e,'in')}
+       <TouchableWithoutFeedback  
+        onPressIn ={(e) => this.onPressIn(e,note.id)}
         onPressOut={(e) => this.onPressOut(e,'out')} 
         delayPressOut={200} 
         >
-
- 			<View style={styles.container}> 
-      
-
-            <Image
-              source={{uri: movie.posters.thumbnail}}
-              style={styles.thumbnail}
-            />
-            <View style={styles.rightContainer}>
-              <Text style={styles.title}>{movie.title} nn</Text>
-              <Text style={styles.year}>{movie.year}</Text>
-             
-            </View>
-           
-          </View>
- 
-    </TouchableOpacity >
+         <View  style={styles.container}>    
+            <TouchableHighlight style={{flex:1}} onPress={()=>this.props.viewNote(note.id)}>     
+            <View  >
+               <Text style={styles.title}>{title}</Text>
+               <Text style={styles.content}>{content}</Text>  
+             </View>
+             </TouchableHighlight>
+             <TouchableHighlight style={styles.button} onPress={()=>this.props.delNote(note.id)}  underlayColor='#99d9f4'>
+                <Text style={styles.buttonText} >删除</Text> 
+             </TouchableHighlight>   
+     		</View>
+     
+        </TouchableWithoutFeedback>
 
      );
 
    },
-   getInitialState: function() {
-     return {
-       dataSource: new ListView.DataSource({
-         rowHasChanged: (row1, row2) => row1 !== row2,
-       }),
-       loaded: false,
-       movies: null,
-       dd: `${test} init`,
-       post: 'loading...',
-       event: 'ppp',
-       route: {
-         name: 'home',
-         index: 0
-       },
-       pushState :{
-         on: false,
-         yArr: []
-       },
-       routeIndex: 0
-     };
-   },
+
    componentDidMount: function() {
      var me = this;
-     me.fetchData();
-   },
-   fetchData: function() {
-     fetch(Config.req_url)
-       .then((response) => response.json())
-       .then((responseData) => {
-         this.setState({
-           movies: responseData.data,
-           dataSource: this.state.dataSource.cloneWithRows(responseData.data),
-           loaded: true
-         });
-       })
-       .done();
-   },
-   renderLoadingView: function() {
-     return (
-       <View style={styles.container} >
-          <Text>
-            Loading movies...
-          </Text>
-        </View>
-     );
-
    },
 
    render: function() {
-     if (!this.state.movies) {
-       return this.renderLoadingView();
-     }
-     return (
 
+     return (
        <ListView onMoveShouldSetResponder={(e)=>this.onMoveShouldSetResponder(e,'onMoveShouldSetResponder')} 
               onScroll ={(e)=>this.onScroll(e,'onScroll ')} 
-              dataSource={this.state.dataSource}
-              renderRow={this.renderMovie}  
+              dataSource={this.props.dataSource}
+              renderRow={this.renderNote}  
               > 
           </ListView>
      );
    }
  });
  var styles = StyleSheet.create({
-   container1: {
-     flex: 1,
-     backgroundColor: '#00a2ed',
-     flexDirection: 'column',
-   },
-   container2: {
-     flex: 1,
-     height: 56,
-     backgroundColor: '#39ED00',
-     flexDirection: 'column',
-   },
    container: {
      flex: 1,
      flexDirection: 'row',
-     justifyContent: 'center',
+     justifyContent: 'flex-start',
      alignItems: 'center',
      backgroundColor: '#F5FCFF',
    },
    title: {
      fontSize: 20,
      marginBottom: 8,
-     textAlign: 'center',
+     textAlign: 'left',
    },
-   year: {
-     textAlign: 'center',
+   content: {
+     textAlign: 'left',
    },
+
    listView: {
      paddingTop: 20,
      height: 100,
      backgroundColor: '#F5FCFF',
    },
-   thumbnail: {
-     width: 53,
-     height: 81,
+   button: {
+     width: 30,
+     flexDirection: 'row',
+     backgroundColor: '#48BBEC',
+     borderColor: '#48BBEC',
      borderWidth: 1,
-     borderColor: 'red'
-   }
+     borderRadius: 8,
+     marginBottom: 10,
+     marginRight: 20,
+     alignSelf: 'center',
+     justifyContent: 'flex-end'
+   },
+   buttonText: {
+     fontSize: 14,
+     color: 'white',
+     alignSelf: 'center'
+   },
  });
  module.exports = NoteList;

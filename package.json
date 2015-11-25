@@ -1,15 +1,11 @@
 {
-  "name": "NoteApp",
+  "name": "AwesomeProject",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "react-native start"
   },
   "dependencies": {
-    "merge": "^1.2.0",
-    "mongodb": "^2.0.48",
-    "mongoskin": "^2.0.3",
-    "react-native": "^0.13.2",
-    "react-native-refresher": "^0.1.1"
+    "react-native": "^0.13.2"
   }
 }

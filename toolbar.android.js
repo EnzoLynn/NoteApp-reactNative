@@ -14,8 +14,10 @@
  } = React;
 
  var ToolbarAndroid = require('ToolbarAndroid');
+ var Note = require('./myLib/noteModel.js');
  var toolbarTop = React.createClass({
  	onActionSelected: function(position) {
+ 		var me = this;
  		let navigator = this.props.navigator;
  		if (position === 0) { // index of 'Settings' 
 
@@ -23,28 +25,25 @@
  				navigator.popToRoute(navigator.getCurrentRoutes()[1]);
  			} else {
  				navigator.push({
- 					name: 'story',
+ 					name: 'add',
  					index: 1
  				});
  			}
- 		} else if (position === 1) {
- 			navigator.popToRoute(navigator.getCurrentRoutes()[0]);
+ 		} else if (position === 1) { 
+ 				var note = new Note();			
+    			note.saveNote(me.props.refreshNotes);
  		} else {
  			navigator.popToTop();
  		}
  	},
- 	render: function() {
- 		var ico = this.props.myico;
+ 	render: function() { 
  		return (
  			<View>
-				<ToolbarAndroid
-	                  logo={{uri: 'http://192.168.91.101:818/image/fax/inFax.png'}}
+				<ToolbarAndroid					   
 	                  title="NoteApp"
-	                  titleColor="red"
+	                  titleColor="#000000"
 	                  style={styles.toolbar}
-	                  actions={[{title: 'story', icon: {uri:ico}, show: 'always'}
-	                  ,{title: 'home', show: 'always'},
-	                  {title:'popToTop'}]}
+	                  actions={[{title: '+', show: 'always'}]}
 	                 onActionSelected={this.onActionSelected}  />
              </View>
  		);
@@ -52,8 +51,10 @@
  });
  var styles = StyleSheet.create({
  	toolbar: {
- 		backgroundColor: '#ED4D00',
+ 		backgroundColor: '#48BBEC', 
  		height: 56,
+ 		fontSize:12,
+ 		textAlign:'center'
  	}
  });
 
